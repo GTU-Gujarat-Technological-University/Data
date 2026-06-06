@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon shortcut" href="https://assets.vercel.com/image/upload/q_auto/front/favicon/vercel/favicon.ico" type="image/x-icon"/>
+  <title>GTU Student Details</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0f14;
+      --surface:   #14171f;
+      --panel:     #1a1e28;
+      --border:    rgba(255,255,255,0.07);
+      --border-md: rgba(255,255,255,0.13);
+      --accent:    #4f7cff;
+      --accent-dim:#2a4a9e;
+      --accent-glow: rgba(79,124,255,0.18);
+      --text:      #e8ecf4;
+      --muted:     #7a8299;
+      --danger:    #ff5a5a;
+      --success:   #36d983;
+      --tag-bg:    rgba(79,124,255,0.12);
+      --tag-text:  #8aabff;
+      --radius:    14px;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13,15,20,0.85);
+      backdrop-filter: blur(14px);
+    }
+
+    .logo-mark {
+      width: 45px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text {
+      font-family: var(--font-head);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .logo-badge {
+      margin-left: 4px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(79,124,255,0.2);
+    }
+
+    main {
+      padding: 48px 24px 80px;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero {
+      text-align: center;
+      padding-bottom: 48px;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-family: var(--font-head);
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #e8ecf4 0%, #7a8299 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+
+    .hero-sub {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .search-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 28px 24px;
+      margin-bottom: 36px;
+    }
+
+    .field-label {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    /* Source selector */
+    .source-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .source-option {
+      position: relative;
+    }
+
+    .source-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .source-option label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      background: var(--panel);
+    }
+
+    .source-option label:hover {
+      border-color: var(--border-md);
+    }
+
+    .source-option input:checked + label {
+      border-color: var(--accent);
+      background: rgba(79,124,255,0.08);
+    }
+
+    .source-option input:disabled + label {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .source-name {
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .source-url {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .source-tag {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .tag-inactive {
+      background: rgba(255,90,90,0.12);
+      color: #ff8a8a;
+    }
+
+    .tag-active {
+      background: rgba(54,217,131,0.1);
+      color: #5eeaa8;
+    }
+
+    /* Enrollment input row */
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .enroll-input {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .enroll-input::placeholder { color: var(--muted); }
+
+    .enroll-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .search-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-family: var(--font-head);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .search-btn:hover { background: #3d6bff; }
+    .search-btn:active { transform: scale(0.98); }
+    .search-btn:disabled { background: var(--accent-dim); cursor: not-allowed; transform: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    .result-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: none;
+      animation: fadeUp 0.35s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-card.visible { display: block; }
+
+    .card-hero {
+      background: linear-gradient(135deg, #1a2140 0%, #111525 60%, #0d1020 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 36px 32px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-hero::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: var(--accent-glow);
+      filter: blur(50px);
+      pointer-events: none;
+    }
+
+    .profile-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+    }
+
+    .avatar-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.15);
+      object-fit: cover;
+      background: var(--panel);
+      display: block;
+    }
+
+    .avatar-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      opacity: 0.5;
+    }
+
+    .profile-name {
+      font-family: var(--font-head);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .enroll-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .source-link-btn {
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--accent);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      opacity: 0.8;
+      transition: opacity 0.15s;
+    }
+
+    .source-link-btn:hover { opacity: 1; }
+
+    /* Card body */
+    .card-body {
+      padding: 28px 32px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .detail-key {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .detail-val {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .raw-section {
+      margin-top: 28px;
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      display: none;
+    }
+
+    .raw-section.visible { display: block; }
+
+    .raw-label {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .raw-label a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 11px;
+    }
+
+    .iframe-shell {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .iframe-shell iframe {
+      display: block;
+      width: 100%;
+      border: none;
+      pointer-events: none;
+    }
+
+    .status-bar {
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 13px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .status-bar.error {
+      display: flex;
+      background: rgba(255,90,90,0.1);
+      border: 1px solid rgba(255,90,90,0.2);
+      color: var(--danger);
+    }
+
+    .status-bar.info {
+      display: flex;
+      background: var(--tag-bg);
+      border: 1px solid rgba(79,124,255,0.2);
+      color: var(--tag-text);
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 16px 32px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 600px) {
+      header { padding: 0 16px; }
+      main { padding: 32px 16px 60px; }
+      .search-panel { padding: 20px 16px; }
+      .card-hero { padding: 24px 20px 20px; }
+      .card-body { padding: 20px; }
+      .input-row { flex-direction: column; }
+      .search-btn { justify-content: center; }
+      .profile-row { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+  <header>
+    <div class="logo-mark">GTU</div>
+    <span class="logo-text">Student Lookup</span>
+  </header>
+
+  <main>
+    <div class="hero">
+      <p class="hero-eyebrow">Gujarat Technological University</p>
+      <h1>Student Record<br>Lookup Portal</h1>
+      <p class="hero-sub">Fetch student details from GTU's official portals using an enrollment number.</p>
+    </div>
+
+    <!-- Search Panel -->
+    <div class="search-panel">
+      <label class="field-label">Select Source Portal</label>
+      <div class="source-grid">
+
+        <div class="source-option">
+          <input type="radio" name="source" id="src-100" value="100" />
+          <label for="src-100">
+            <span class="source-name">100 Points</span>
+            <span class="source-url">100points.gtu.ac.in</span>
+          </label>
+        </div>
+
+        <div class="source-option">
+          <input type="radio" name="source" id="src-de" value="de" checked />
+          <label for="src-de">
+            <span class="source-name">DE Portal</span>
+            <span class="source-url">de.gtu.ac.in</span>
+          </label>
+        </div>
+
+        <div class="source-option">
+          <input type="radio" name="source" id="src-pmms" value="pmms" />
+          <label for="src-pmms">
+            <span class="source-name">PMMS Portal</span>
+            <span class="source-url">pmms.gtu.ac.in</span>
+          </label>
+        </div>
+
+        <div class="source-option">
+          <input type="radio" name="source" id="src-billdesk" value="billdesk" />
+          <label for="src-billdesk">
+            <span class="source-name">BillDesk</span>
+            <span class="source-url">billdesk.gtu.ac.in</span>
+          </label>
+        </div>
+
+      </div>
+
+      <label class="field-label" for="enrollment">Enrollment Number</label>
+      <div class="input-row">
+        <input
+          class="enroll-input"
+          type="text"
+          id="enrollment"
+          placeholder="e.g. 226040307028"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="search-btn" id="searchBtn" onclick="doSearch()">
+          <span id="btnLabel">Search</span>
+          <span id="btnSpinner" class="spinner" style="display:none;"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="status-bar" id="statusBar"></div>
+
+    <div class="result-card" id="resultCard">
+      <div class="card-hero">
+        <div class="profile-row">
+          <div class="avatar-wrap">
+            <img class="avatar" id="avatarImg" src="" alt="Student photo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'80\' viewBox=\'0 0 80 80\'%3E%3Crect width=\'80\' height=\'80\' fill=\'%231a1e28\'/%3E%3Ccircle cx=\'40\' cy=\'32\' r=\'14\' fill=\'%237a8299\'/%3E%3Cellipse cx=\'40\' cy=\'68\' rx=\'22\' ry=\'16\' fill=\'%237a8299\'/%3E%3C/svg%3E'" />
+            <div class="avatar-ring"></div>
+          </div>
+          <div>
+            <div class="profile-name" id="studentName">—</div>
+            <div class="enroll-pill" id="enrollPill">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                <rect x="1" y="1" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.2"/>
+                <rect x="3" y="3" width="4" height="4" rx="1" fill="currentColor"/>
+              </svg>
+              <span id="enrollDisplay"></span>
+            </div>
+            <br/>
+            <a href="#" class="source-link-btn" id="sourceLinkBtn" target="_blank" style="display:none;">
+              ↗ View on portal
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="detail-grid" id="detailGrid"></div>
+        <div class="raw-section" id="rawSection">
+          <div class="raw-label">
+            Raw Portal Output
+            <a href="#" id="rawSourceLink" target="_blank" style="display:none;"></a>
+          </div>
+          <div class="iframe-shell">
+            <iframe id="rawIframe" src="about:blank" title="Raw portal output"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const PORTALS = {
+    '100':      { label: '100 Points',   base: 'https://www.100points.gtu.ac.in' },
+    'de':       { label: 'DE Portal',    base: 'https://de.gtu.ac.in' },
+    'pmms':     { label: 'PMMS Portal',  base: 'https://pmms.gtu.ac.in' },
+    'billdesk': { label: 'BillDesk',     base: 'https://billdesk.gtu.ac.in' },
+  };
+
+  function getEl(id) { return document.getElementById(id); }
+
+  function setStatus(msg, type) {
+    const bar = getEl('statusBar');
+    bar.className = 'status-bar ' + type;
+    bar.style.display = 'flex';
+    bar.innerHTML = `<span>${msg}</span>`;
+  }
+
+  function clearStatus() {
+    const bar = getEl('statusBar');
+    bar.style.display = 'none';
+    bar.className = 'status-bar';
+  }
+
+  function setLoading(on) {
+    const btn = getEl('searchBtn');
+    getEl('btnLabel').textContent = on ? 'Searching…' : 'Search';
+    getEl('btnSpinner').style.display = on ? 'inline-block' : 'none';
+    btn.disabled = on;
+
+    document.querySelectorAll('input[name="source"]').forEach(r => r.disabled = on);
+    getEl('enrollment').disabled = on;
+  }
+
+  const FIELD_META = {
+    Email:       { label: 'Email Address', icon: '✉' },
+    Institute:   { label: 'College Code',  icon: '🏛' },
+    Branch:      { label: 'Branch Code',   icon: '📚' },
+    Discipline:  { label: 'Discipline',    icon: '🎓' },
+    Year:        { label: 'Year',          icon: '📅' },
+    College:     { label: 'College',       icon: '🏫' },
+    Department:  { label: 'Department',    icon: '🔬' },
+  };
+
+  function buildDetailGrid(data) {
+    const grid = getEl('detailGrid');
+    grid.innerHTML = '';
+    const skip = new Set(['Name', 'text', 'originaltext', 'source_link']);
+
+    Object.entries(data).forEach(([key, val]) => {
+      if (skip.has(key) || !val) return;
+      const meta = FIELD_META[key] || { label: key, icon: '' };
+      const item = document.createElement('div');
+      item.className = 'detail-item';
+      item.innerHTML = `<span class="detail-key">${meta.label} ${meta.icon}</span><span class="detail-val">${escHtml(val)}</span>`;
+      grid.appendChild(item);
+    });
+
+    if (!grid.children.length) {
+      grid.innerHTML = '<p style="color:var(--muted);font-size:13px;">No additional fields returned.</p>';
+    }
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function fitIframe(iframe) {
+    try {
+      const h = iframe.contentWindow.document.body.scrollHeight;
+      iframe.style.height = (h + 20) + 'px';
+    } catch (_) {
+      iframe.style.height = '600px';
+    }
+  }
+
+  async function doSearch() {
+    const enroll = getEl('enrollment').value.trim();
+    if (!enroll) {
+      setStatus('Please enter an enrollment number.', 'error');
+      return;
+    }
+
+    const source = document.querySelector('input[name="source"]:checked')?.value || 'de';
+    clearStatus();
+    setLoading(true);
+    getEl('resultCard').classList.remove('visible');
+    getEl('rawSection').classList.remove('visible');
+
+    try {
+      const res = await fetch(`/${encodeURIComponent(enroll)}/?source=${source}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      if (!data.Name) {
+        setStatus('Student not found. Please check the enrollment number and selected portal.', 'error');
+        return;
+      }
+
+      getEl('studentName').textContent = data.Name;
+      getEl('enrollDisplay').textContent = enroll;
+
+      const avatarImg = getEl('avatarImg');
+      avatarImg.src = `/${encodeURIComponent(enroll)}/media/`;
+
+      const srcBtn = getEl('sourceLinkBtn');
+      if (data.source_link) {
+        srcBtn.href = data.source_link;
+        srcBtn.style.display = 'inline-flex';
+      } else {
+        srcBtn.style.display = 'none';
+      }
+
+      buildDetailGrid(data);
+
+      if (data.originaltext) {
+        const rawSection = getEl('rawSection');
+        rawSection.classList.add('visible');
+        const iframe = getEl('rawIframe');
+        iframe.srcdoc = data.originaltext;
+        iframe.onload = () => fitIframe(iframe);
+
+        const rawLink = getEl('rawSourceLink');
+        if (data.source_link) {
+          rawLink.href = data.source_link;
+          rawLink.textContent = '↗ ' + data.source_link;
+          rawLink.style.display = 'inline';
+        }
+      }
+
+      getEl('resultCard').classList.add('visible');
+
+    } catch (err) {
+      setStatus(
+        `Failed to fetch data. Make sure <code>server.py</code> is running at <code>/</code>. (${err.message})`,
+        'error'
+      );
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  getEl('enrollment').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+  });
+
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const enroll = params.get('enrollment');
+    if (enroll) getEl('enrollment').value = enroll;
+  })();
+</script>
+</body>
+</html>
